@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_select_genre"
+        android:title="Select by Genre"/>
+    <item
+        android:id="@+id/nav_select_song"
+        android:title="Select by Song"/>
+    <item
+        android:id="@+id/nav_add_playlist"
+        android:title="Add to Playlist"/>
+    <item
+        android:id="@+id/nav_start_swiping"
+        android:title="Start Swiping!"/>
+</menu>

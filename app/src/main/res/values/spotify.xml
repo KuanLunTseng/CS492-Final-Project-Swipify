@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base URL -->
+    <string name="spotify_base_url">https://api.spotify.com</string>
+
+    <!-- RedirectUri -->
+    <string name="com_spotify_sdk_redirect_scheme">com.kuanluntseng.swipify</string>
+    <string name="com_spotify_sdk_redirect_host">callback</string>
+
+    <string name="token_type">Bearer</string>
+</resources>

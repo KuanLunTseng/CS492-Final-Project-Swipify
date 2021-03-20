@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.kuanluntseng.swipify">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <queries>
+        <package android:name="com.spotify.music" />
+    </queries>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Swipify">
+
+        <activity
+            android:name=".settings.SettingsActivity"
+            android:parentActivityName=".MainActivity"/>
+
+        <activity android:name=".genre.GenreActivity"
+            android:parentActivityName=".MainActivity"/>
+
+        <activity android:name=".swipe.ViewCurrentPlaylistActivity"
+            android:parentActivityName=".swipe.SwipeActivity"/>
+
+        <activity android:name=".song.SongActivity"
+            android:parentActivityName=".MainActivity"/>
+
+        <activity android:name=".addplaylist.AddPlaylistActivity"
+            android:parentActivityName=".MainActivity"/>
+
+        <activity android:name=".swipe.SwipeActivity"
+            android:parentActivityName=".MainActivity"/>
+
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="keyboardHidden|keyboard|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.Swipify.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
