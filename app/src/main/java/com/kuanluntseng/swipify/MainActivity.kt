@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity(),
     NavigationView.OnNavigationItemSelectedListener,
     SharedPreferences.OnSharedPreferenceChangeListener {
     private val TAG = MainActivity::class.java.simpleName
-    val CLIENT_ID = "2baa0fc179d94869b28342364bd5ef98"
+    val CLIENT_ID = "YOUR CLIENT ID"
     val AUTH_TOKEN_REQUEST_CODE = 0x10
 
     private lateinit var drawerLayout: DrawerLayout
