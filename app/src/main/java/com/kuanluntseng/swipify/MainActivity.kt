@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity(),
     NavigationView.OnNavigationItemSelectedListener,
     SharedPreferences.OnSharedPreferenceChangeListener {
     private val TAG = MainActivity::class.java.simpleName
-    val CLIENT_ID = "YOUR CLIENT ID"
+    val CLIENT_ID = "2baa0fc179d94869b28342364bd5ef98"
     val AUTH_TOKEN_REQUEST_CODE = 0x10
 
     private lateinit var drawerLayout: DrawerLayout
@@ -121,11 +121,22 @@ class MainActivity : AppCompatActivity(),
             .setShowDialog(false)
             .setScopes(
                 arrayOf(
-                    getString(R.string.user_read_email),
+                    "user-read-playback-position",
+                    "user-read-private",
+                    "user-read-email",
+                    "playlist-read-private",
+                    "user-library-read",
+                    "user-library-modify",
+                    "user-top-read",
+                    "playlist-read-collaborative",
+                    "playlist-modify-public",
+                    "playlist-modify-private",
+                    "ugc-image-upload",
+                    "user-follow-read",
+                    "user-follow-modify",
                     "user-read-playback-state",
                     "user-modify-playback-state",
-                    "playlist-modify-public",
-                    "playlist-modify-private"
+                    "user-read-currently-playing"
                 )
             )
             .build()

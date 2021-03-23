@@ -7,8 +7,6 @@ import android.graphics.PorterDuff
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import android.view.GestureDetector
-import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
@@ -18,13 +16,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.ViewModelProvider
-import com.bumptech.glide.util.Util
 import com.google.gson.GsonBuilder
 import com.kuanluntseng.swipify.R
 import com.kuanluntseng.swipify.data.playback.Playback
-import com.kuanluntseng.swipify.data.recommendations.Recommendations
 import com.kuanluntseng.swipify.databinding.AppRemoteLayoutBinding
-import com.kuanluntseng.swipify.genre.GenreActivity
 //import com.kuanluntseng.swipify.swipe.SwipeActivity.SpotifySampleContexts.TRACK_URI
 import com.kuanluntseng.swipify.utils.Utils
 import com.spotify.android.appremote.api.ConnectionParams
@@ -44,7 +39,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
-import kotlin.concurrent.thread
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -181,49 +175,47 @@ class SwipeActivity : AppCompatActivity() {
                     }
                     .setErrorCallback(errorCallback)
 
-                runBlocking {
-                    launch(Dispatchers.IO) {
-                        val resultsPlaybackId: Call<Playback> =
-                            Utils.spotifyService.getCurrentPlayback(
-                                "Bearer " + Utils.token
-                            )
-                        resultsPlaybackId.enqueue(object : Callback<Playback> {
-                            override fun onResponse(
-                                call: Call<Playback>,
-                                response: Response<Playback>
-                            ) {
-                                if (response.isSuccessful) {
-                                    val responseBody = response.body()
-                                    responseBody?.let {
-                                        Utils.currentPlayback = it
-                                    }
-                                }
-                            }
+                val resultsPlaybackId: Call<Playback> =
+                    Utils.spotifyService.getCurrentPlayback(
+                        "Bearer " + Utils.token
+                    )
 
-                            override fun onFailure(call: Call<Playback>, t: Throwable) {
-                                t.printStackTrace()
+                resultsPlaybackId.enqueue(object : Callback<Playback> {
+                    override fun onResponse(
+                        call: Call<Playback>,
+                        response: Response<Playback>
+                    ) {
+                        if (response.isSuccessful) {
+                            val responseBody = response.body()
+                            responseBody?.let {
+                                Utils.currentPlayback = it
                             }
-                        })
-
-                        delay(100)
-
-                        val resultsAddItem: Call<Any> = Utils.spotifyService.addItemsToPlaylist(
-                            "Bearer " + Utils.token,
-                            Utils.currentPlaylistId,
-                            Utils.currentPlayback.item!!.uri!!
-                        )
-                        resultsAddItem.enqueue(object : Callback<Any> {
-                            override fun onResponse(call: Call<Any>, response: Response<Any>) {
-                                if (response.isSuccessful) {
-                                    Log.d("TAG", "Add an item to a playlist successfully")
-                                }
-                            }
-
-                            override fun onFailure(call: Call<Any>, t: Throwable) {
-                                t.printStackTrace()
-                            }
-                        })
+                        }
                     }
+
+                    override fun onFailure(call: Call<Playback>, t: Throwable) {
+                        t.printStackTrace()
+                    }
+                })
+
+                GlobalScope.launch {
+                    delay(500)
+                    val resultsAddItem: Call<Any> = Utils.spotifyService.addItemsToPlaylist(
+                        "Bearer " + Utils.token,
+                        Utils.currentPlaylistId,
+                        Utils.currentPlayback.item!!.uri!!
+                    )
+                    resultsAddItem.enqueue(object : Callback<Any> {
+                        override fun onResponse(call: Call<Any>, response: Response<Any>) {
+                            if (response.isSuccessful) {
+                                Log.d("TAG", "Add an item to a playlist successfully")
+                            }
+                        }
+
+                        override fun onFailure(call: Call<Any>, t: Throwable) {
+                            t.printStackTrace()
+                        }
+                    })
                 }
             }
 
@@ -348,25 +340,47 @@ class SwipeActivity : AppCompatActivity() {
 
     }
 
-    fun queueRecommendations() {
-        for (rec in Utils.recommendations.tracks!!) {
-            val results: Call<Any> = Utils.spotifyService.queueSong(
-                "Bearer " + Utils.token,
-                Utils.deviceId.devices?.get(0)?.id.toString(),
-                rec!!.uri!!
-            )
-            results.enqueue(object : Callback<Any> {
-                override fun onResponse(call: Call<Any>, response: Response<Any>) {
-                    if (response.isSuccessful) {
-                        response.let { rec.uri?.let { it -> Utils.likedSongs.add(it) } }
-                        Log.d(TAG, "Added " + rec.name + " successfully!")
+    fun getSmartphoneId(): String? {
+        Utils.deviceId.devices?.let {
+            for (d in it) {
+                d?.run {
+                    if (type == "Smartphone") {
+                        return d.id
                     }
                 }
+            }
+        }
+        return null
+    }
 
-                override fun onFailure(call: Call<Any>, t: Throwable) {
-                    t.printStackTrace()
+    fun queueRecommendations() {
+        GlobalScope.launch(CoroutineName("RushGun")) {
+            runBlocking {
+                for (rec in Utils.recommendations.tracks!!) {
+                    getSmartphoneId()?.let { phoneId ->
+                        rec?.uri?.let { uri ->
+                            Utils.spotifyService.queueSong(
+                                "Bearer " + Utils.token,
+                                phoneId,
+                                uri
+                            )
+                        }
+                    }?.enqueue(object : Callback<Any> {
+                        override fun onResponse(call: Call<Any>, response: Response<Any>) {
+                            if (response.isSuccessful) {
+                                if (rec != null) {
+                                    response.let { rec.uri?.let { it -> Utils.likedSongs.add(it) } }
+                                    Log.d(TAG, "Added " + rec.name + " successfully!")
+                                }
+                            }
+                        }
+
+                        override fun onFailure(call: Call<Any>, t: Throwable) {
+                            t.printStackTrace()
+                        }
+                    })
                 }
-            })
+            }
         }
     }
 
