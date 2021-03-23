@@ -46,7 +46,7 @@ import kotlin.coroutines.suspendCoroutine
 class SwipeActivity : AppCompatActivity() {
 
     object AuthParams {
-        const val CLIENT_ID = "089d841ccc194c10a77afad9e1c11d54"
+        const val CLIENT_ID = "YOUR CLIENT ID"
         const val REDIRECT_URI = "comspotifytestsdk://callback"
     }
 
